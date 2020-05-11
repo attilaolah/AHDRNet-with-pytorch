@@ -1,36 +1,39 @@
+import cv2
+import numpy as np
+import math
+from tqdm import tqdm
+from torch.optim import Adam
+from matplotlib import pyplot as plt
+from opts import TrainOptions
+from datsetprocess import *
+from model import *
+from utils import *
+import torch.autograd as autograd
+import torch.utils.data as Data
+import torch.nn.functional as F
+import torch
+from torch.autograd import Variable
+import torch.nn as nn
 import os
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-import torch.nn as nn
-from torch.autograd import Variable
-import torch
-import torch.nn.functional as F
-import torch.utils.data as Data
-import torch.autograd as autograd
-from utils import *
-from model import *
-from datsetprocess import *
-from opts import TrainOptions
-from matplotlib import pyplot as plt
-from torch.optim import Adam
-from tqdm import tqdm
-import math
-import numpy as np
-import cv2
-import os
 
 """
     Author: Wei Wang
 """
 
+
 def psnr2(img1, img2):
-   mse = np.mean( (img1/255. - img2/255.) ** 2 )
-   if mse < 1.0e-10:
-      return 100
-   PIXEL_MAX = 1
-   return 20 * math.log10(PIXEL_MAX / math.sqrt(mse))
+    mse = np.mean((img1/255. - img2/255.) ** 2)
+    if mse < 1.0e-10:
+        return 100
+    PIXEL_MAX = 1
+    return 20 * math.log10(PIXEL_MAX / math.sqrt(mse))
+
 
 scene_directory = 'F:\project\AHDRNet\data\Test\PAPER\ManStanding'
+
+
 def inference():
     # Load the image
     # Read Expo times in scene
@@ -72,7 +75,7 @@ def inference():
     pre = np.clip(pre * 255.0, 0., 255.)
     pre = pre.transpose(1, 2, 0)
     #pre1=cv2.cvtColor(pre, cv2.COLOR_RGB2BGR)
-    p=psnr2(pre,label)
+    p = psnr2(pre, label)
     print(p)
     #cv2.imwrite('./recover/PeopleTalking/out.png', pre)
     #cv2.imwrite('./recover/PeopleTalking/label.png', label)

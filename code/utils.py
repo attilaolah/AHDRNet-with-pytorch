@@ -1,5 +1,6 @@
 import numpy as np
-import os, glob
+import os
+import glob
 import cv2
 import imageio
 from math import log10
@@ -33,7 +34,7 @@ def ReadImages(fileNames):
 
 def ReadLabel(fileName):
     label = imageio.imread(os.path.join(fileName, 'HDRImg.hdr'), 'hdr')
-    label = label[:, :, [2, 1, 0]]  ##cv2
+    label = label[:, :, [2, 1, 0]]  # cv2
     return label
 
 
@@ -44,14 +45,17 @@ def LDR_to_HDR(imgs, expo, gamma):
 def range_compressor(x):
     return (np.log(1 + 5000 * x)) / np.log(1 + 5000)
 
+
 def psnr(x, target):
     sqrdErr = np.mean((x - target) ** 2)
     return 10 * log10(1/sqrdErr)
+
 
 def batch_PSNR(img, imclean, data_range):
     Img = img.data.cpu().numpy().astype(np.float32)
     Iclean = imclean.data.cpu().numpy().astype(np.float32)
     PSNR = 0
     for i in range(Img.shape[0]):
-        PSNR += compare_psnr(Iclean[i,:,:,:], Img[i,:,:,:], data_range=data_range)
+        PSNR += compare_psnr(Iclean[i, :, :, :],
+                             Img[i, :, :, :], data_range=data_range)
     return (PSNR/Img.shape[0])

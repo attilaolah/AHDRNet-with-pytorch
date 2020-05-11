@@ -2,10 +2,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class Encoder3Conv(nn.Module):
     def __init__(self, in_ch, out_ch):
         super(Encoder, self).__init__()
-        self.conv=nn.Sequential(
+        self.conv = nn.Sequential(
             nn.Conv2d(in_ch, out_ch, 3, padding=1, padding_mode='zeros'),
             nn.ReLU(inplace=True),
             nn.Conv2d(out_ch, out_ch, 3, padding=1, padding_mode='zeros'),
@@ -13,34 +14,40 @@ class Encoder3Conv(nn.Module):
             nn.Conv2d(out_ch, out_ch, 3, padding=1, padding_mode='zeros'),
             nn.ReLU(inplace=True),
         )
+
     def forward(self, x):
-        out=self.conv(x)
+        out = self.conv(x)
         return out
+
 
 class Encoder1Conv(nn.Module):
     def __init__(self, in_ch, out_ch):
         super(Encoder, self).__init__()
-        self.conv=nn.Sequential(
+        self.conv = nn.Sequential(
             nn.Conv2d(in_ch, out_ch, 3, padding=1, padding_mode='zeros'),
             nn.ReLU(inplace=True),
         )
+
     def forward(self, x):
-        out=self.conv(x)
+        out = self.conv(x)
         return out
+
 
 class AttentionModule(nn.Module):
     def __init__(self):
         super(AttentionModule, self).__init__()
-        self.conv=nn.Sequential(
+        self.conv = nn.Sequential(
             nn.Conv2d(128, 64, 3, padding=1),
             nn.ReLU(inplace=True),
             nn.Conv2d(64, 64, 3, padding=1),
         )
+
     def forward(self, x1, x2):
-        x=torch.cat([x1, x2], dim=1)
-        x1=self.conv(x)
-        out=torch.sigmoid(x1)
+        x = torch.cat([x1, x2], dim=1)
+        x1 = self.conv(x)
+        out = torch.sigmoid(x1)
         return out
+
 
 class DRDB(nn.Module):
     def __init__(self, in_ch=64, growth_rate=32):
@@ -83,6 +90,7 @@ class DRDB(nn.Module):
         out = x+F.relu(x6)
         return out
 
+
 class AttentionNetwork(nn.Module):
     def __init__(self):
         super(AttentionNetwork, self).__init__()
@@ -91,7 +99,7 @@ class AttentionNetwork(nn.Module):
 #            nn.Conv2d(6, 64, 3, padding=1),
 #            nn.ReLU(inplace=True),)
         self.attention = AttentionModule()
- 
+
     def forward(self, x1, x2, x3):
         feature1 = self.encoder(x1)
         refer = self.encoder(x2)
@@ -103,6 +111,7 @@ class AttentionNetwork(nn.Module):
         out = torch.cat([feature_1, refer, feature_2], dim=1)
         return out, refer
 
+
 class MergingNetwork(nn.Module):
     def __init__(self):
         super(MergingNetwork, self).__init__()
@@ -113,6 +122,7 @@ class MergingNetwork(nn.Module):
         self.conv2 = nn.Conv2d(192, 64, 3, padding=1)
         self.conv3 = nn.Conv2d(64, 64, 3, padding=1)
         self.conv4 = nn.Conv2d(64, 3, 3, padding=1)
+
     def forward(self, x, xskip):
         x1 = self.conv1(x)
         x1 = F.relu(x1)
@@ -134,12 +144,14 @@ class MergingNetwork(nn.Module):
 
         return out
 
+
 class AHDRNet(nn.Module):
     def __init__(self):
         super(AHDRNet, self).__init__()
         self.A = AttentionNetwork()
         self.M = MergingNetwork()
+
     def forward(self, x1, x2, x3):
-        midout,ref = self.A(x1, x2, x3)
+        midout, ref = self.A(x1, x2, x3)
         finalout = self.M(midout, ref)
         return finalout

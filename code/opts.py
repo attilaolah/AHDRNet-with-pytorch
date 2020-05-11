@@ -7,8 +7,11 @@ import os
 
     Author: Wei Wang
 """
+
+
 def INFO(string):
     print("[ AHDRNet ] %s" % (string))
+
 
 def presentParameters(args_dict):
     """
@@ -87,7 +90,8 @@ class TestOptions():
         parser = argparse.ArgumentParser()
         parser.add_argument('--image1', type=str, required=True)
         parser.add_argument('--image2', type=str, required=True)
-        parser.add_argument('--model', type=str, default="./train_result_1/model/latest.pth")
+        parser.add_argument('--model', type=str,
+                            default="./train_result_1/model/latest.pth")
         parser.add_argument('--res', type=str, default='./recover/result1.png')
         parser.add_argument('--H', type=int, default=400)
         parser.add_argument('--W', type=int, default=600)

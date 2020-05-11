@@ -1,23 +1,22 @@
+import cv2
+import numpy as np
+from math import log10
+from tqdm import tqdm
+from torch.optim import Adam
+from matplotlib import pyplot as plt
+from opts import TrainOptions
+from datsetprocess import *
+from model import *
+from utils import *
+import torch.autograd as autograd
+import torch.utils.data as Data
+import torch.nn.functional as F
+import torch
+from torch.autograd import Variable
+import torch.nn as nn
 import os
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-import torch.nn as nn
-from torch.autograd import Variable
-import torch
-import torch.nn.functional as F
-import torch.utils.data as Data
-import torch.autograd as autograd
-from utils import *
-from model import *
-from datsetprocess import *
-from opts import TrainOptions
-from matplotlib import pyplot as plt
-from torch.optim import Adam
-from tqdm import tqdm
-from math import log10
-import numpy as np
-import cv2
-import os
 
 """
     Author: Wei Wang
@@ -28,7 +27,8 @@ def train(opts):
     # Create the loader
     global ep
     train_data = MyDataset(scene_directory=opts.folder)
-    loader = DataLoader(train_data, batch_size=opts.batch_size, shuffle=True, num_workers=1)
+    loader = DataLoader(train_data, batch_size=opts.batch_size,
+                        shuffle=True, num_workers=1)
     # Create the model
     model = AHDRNet().cuda()
     criterion = nn.L1Loss().to(opts.device)
@@ -43,7 +43,7 @@ def train(opts):
         Loss_list = []
     model.load_state_dict(torch.load('./Model/900.pkl'))
     # Train
-    bar = tqdm(range(901,15000))
+    bar = tqdm(range(901, 15000))
     for ep in bar:
         loss_list = []
         for step, sample in enumerate(loader):
@@ -64,7 +64,8 @@ def train(opts):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            print("[Epoch %d][G loss: %7f][PSNR : %7f]" % (ep, loss_list[-1], psnr))
+            print("[Epoch %d][G loss: %7f][PSNR : %7f]" %
+                  (ep, loss_list[-1], psnr))
         Loss_list.append(np.mean(loss_list))
 
         # Save the training image
@@ -83,5 +84,4 @@ if __name__ == '__main__':
     opts = TrainOptions().parse()
     train(opts)
 
-#def test(opts):
-
+# def test(opts):
