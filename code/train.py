@@ -10,9 +10,10 @@ import torch
 from torch import autograd
 from torch import nn
 from torch import optim
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from datsetprocess import DataLoader, MyDataset
+from datsetprocess import MyDataset
 from model import AHDRNet
 from opts import TrainOptions
 from utils import batch_PSNR
