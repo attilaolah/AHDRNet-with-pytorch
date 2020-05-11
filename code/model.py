@@ -5,7 +5,7 @@ from torch.nn import functional
 
 class Encoder3Conv(nn.Module):
     def __init__(self, in_ch, out_ch):
-        super(Encoder, self).__init__()
+        super().__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(in_ch, out_ch, 3, padding=1, padding_mode='zeros'),
             nn.ReLU(inplace=True),
@@ -22,7 +22,7 @@ class Encoder3Conv(nn.Module):
 
 class Encoder1Conv(nn.Module):
     def __init__(self, in_ch, out_ch):
-        super(Encoder, self).__init__()
+        super().__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(in_ch, out_ch, 3, padding=1, padding_mode='zeros'),
             nn.ReLU(inplace=True),
@@ -35,7 +35,7 @@ class Encoder1Conv(nn.Module):
 
 class AttentionModule(nn.Module):
     def __init__(self):
-        super(AttentionModule, self).__init__()
+        super().__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(128, 64, 3, padding=1),
             nn.ReLU(inplace=True),
@@ -51,7 +51,7 @@ class AttentionModule(nn.Module):
 
 class DRDB(nn.Module):
     def __init__(self, in_ch=64, growth_rate=32):
-        super(DRDB, self).__init__()
+        super().__init__()
         in_ch_ = in_ch
         self.Dcov1 = nn.Conv2d(in_ch_, growth_rate, 3, padding=2, dilation=2)
         in_ch_ += growth_rate
@@ -93,7 +93,7 @@ class DRDB(nn.Module):
 
 class AttentionNetwork(nn.Module):
     def __init__(self):
-        super(AttentionNetwork, self).__init__()
+        super().__init__()
         self.encoder = Encoder1Conv(6, 64)
 #        self.encoder = nn.Sequential(
 #            nn.Conv2d(6, 64, 3, padding=1),
@@ -114,7 +114,7 @@ class AttentionNetwork(nn.Module):
 
 class MergingNetwork(nn.Module):
     def __init__(self):
-        super(MergingNetwork, self).__init__()
+        super().__init__()
         self.conv1 = nn.Conv2d(192, 64, 3, padding=1)
         self.DRDB1 = DRDB()
         self.DRDB2 = DRDB()
@@ -147,7 +147,7 @@ class MergingNetwork(nn.Module):
 
 class AHDRNet(nn.Module):
     def __init__(self):
-        super(AHDRNet, self).__init__()
+        super().__init__()
         self.A = AttentionNetwork()
         self.M = MergingNetwork()
 
