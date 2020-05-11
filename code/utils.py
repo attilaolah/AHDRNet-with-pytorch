@@ -1,11 +1,13 @@
-import numpy as np
-import os
 import glob
+import math
+import os
+
 import cv2
 import imageio
-from math import log10
-import torch
+import numpy as np
 from skimage.measure.simple_metrics import compare_psnr
+import torch
+
 imageio.plugins.freeimage.download()
 
 
@@ -48,7 +50,7 @@ def range_compressor(x):
 
 def psnr(x, target):
     sqrdErr = np.mean((x - target) ** 2)
-    return 10 * log10(1/sqrdErr)
+    return 10 * math.log10(1/sqrdErr)
 
 
 def batch_PSNR(img, imclean, data_range):

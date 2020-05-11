@@ -1,26 +1,17 @@
-import cv2
-import numpy as np
-import math
-from tqdm import tqdm
-from torch.optim import Adam
-from matplotlib import pyplot as plt
-from opts import TrainOptions
-from datsetprocess import *
-from model import *
-from utils import *
-import torch.autograd as autograd
-import torch.utils.data as Data
-import torch.nn.functional as F
-import torch
-from torch.autograd import Variable
-import torch.nn as nn
+"""Tests.
+Author: Wei Wang
+"""
 import os
-
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-"""
-    Author: Wei Wang
-"""
+import cv2
+import math
+import numpy as np
+import torch
+
+from utils import *
+from model import *
+from datsetprocess import *
 
 
 def psnr2(img1, img2):

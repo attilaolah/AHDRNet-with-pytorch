@@ -1,6 +1,6 @@
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
+from torch import nn
+from torch.nn import functional
 
 
 class Encoder3Conv(nn.Module):
@@ -67,27 +67,27 @@ class DRDB(nn.Module):
 
     def forward(self, x):
         x1 = self.Dcov1(x)
-        x1 = F.relu(x1)
+        x1 = functional.relu(x1)
         x1 = torch.cat([x, x1], dim=1)
 
         x2 = self.Dcov2(x1)
-        x2 = F.relu(x2)
+        x2 = functional.relu(x2)
         x2 = torch.cat([x1, x2], dim=1)
 
         x3 = self.Dcov3(x2)
-        x3 = F.relu(x3)
+        x3 = functional.relu(x3)
         x3 = torch.cat([x2, x3], dim=1)
 
         x4 = self.Dcov4(x3)
-        x4 = F.relu(x4)
+        x4 = functional.relu(x4)
         x4 = torch.cat([x3, x4], dim=1)
 
         x5 = self.Dcov5(x4)
-        x5 = F.relu(x5)
+        x5 = functional.relu(x5)
         x5 = torch.cat([x4, x5], dim=1)
 
         x6 = self.conv(x5)
-        out = x+F.relu(x6)
+        out = x+functional.relu(x6)
         return out
 
 
@@ -125,7 +125,7 @@ class MergingNetwork(nn.Module):
 
     def forward(self, x, xskip):
         x1 = self.conv1(x)
-        x1 = F.relu(x1)
+        x1 = functional.relu(x1)
         x2 = self.DRDB1(x1)
         x3 = self.DRDB2(x2)
         x4 = self.DRDB3(x3)
@@ -133,14 +133,14 @@ class MergingNetwork(nn.Module):
         x5 = torch.cat([x2, x3, x4], dim=1)
 
         x6 = self.conv2(x5)
-        x6 = F.relu(x6)
+        x6 = functional.relu(x6)
 
         x7 = x6 + xskip
 
         x8 = self.conv3(x7)
-        x8 = F.relu(x8)
+        x8 = functional.relu(x8)
         x9 = self.conv4(x8)
-        out = F.relu(x9)
+        out = functional.relu(x9)
 
         return out
 

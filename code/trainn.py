@@ -1,22 +1,19 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 import cv2
 import numpy as np
-from math import log10
+import torch
+from torch import autograd
+from torch import nn
+from torch import optim
 from tqdm import tqdm
-from torch.optim import Adam
-from matplotlib import pyplot as plt
-from opts import TrainOptions
+
 from datsetprocess import *
 from model import *
+from opts import TrainOptions
 from utils import *
-import torch.autograd as autograd
-import torch.utils.data as Data
-import torch.nn.functional as F
-import torch
-from torch.autograd import Variable
-import torch.nn as nn
-import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 """
     Author: Wei Wang
@@ -32,7 +29,7 @@ def train(opts):
     # Create the model
     model = AHDRNet().cuda()
     criterion = nn.L1Loss().to(opts.device)
-    optimizer = Adam(model.parameters(), lr=0.0001)
+    optimizer = optim.Adam(model.parameters(), lr=0.0001)
 
     # Load pre-train model
     if os.path.exists(opts.resume):
@@ -47,10 +44,18 @@ def train(opts):
     for ep in bar:
         loss_list = []
         for step, sample in enumerate(loader):
-            batch_x1, batch_x2, batch_x3, batch_x4 = sample['input1'], sample['input2'], sample['input3'], sample[
-                'label']
-            batch_x1, batch_x2, batch_x3, batch_x4 = Variable(batch_x1).cuda(), Variable(batch_x2).cuda(), Variable(
-                batch_x3).cuda(), Variable(batch_x4).cuda()
+            (batch_x1, batch_x2, batch_x3, batch_x4) = (
+                sample['input1'],
+                sample['input2'],
+                sample['input3'],
+                sample['label'],
+            )
+            (batch_x1, batch_x2, batch_x3, batch_x4) = (
+                autograd.Variable(batch_x1).cuda(),
+                autograd.Variable(batch_x2).cuda(),
+                autograd.Variable(batch_x3).cuda(),
+                autograd.Variable(batch_x4).cuda(),
+            )
 
             # Forward and compute loss
             pre = model(batch_x1, batch_x2, batch_x3)

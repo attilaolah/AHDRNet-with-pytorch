@@ -1,6 +1,7 @@
-from torch.utils.data import Dataset, DataLoader
-from utils import *
 from imageio import imread
+from torch.utils.data import Dataset, DataLoader
+
+from utils import *
 
 
 class MyDataset(Dataset):

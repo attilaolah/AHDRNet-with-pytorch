@@ -1,12 +1,10 @@
+"""This script defines the procedure to parse the parameters
+
+Author: Wei Wang
+"""
 import argparse
-import torch
 import os
-
-"""
-    This script defines the procedure to parse the parameters
-
-    Author: Wei Wang
-"""
+import torch
 
 
 def INFO(string):
