@@ -79,8 +79,8 @@ def train(opts, learn_rate: int = 0.0001) -> None:
         if epoch > 0 and epoch % opts.record_epoch == 0:
             # Save progress:
             save_dir = os.path.join(opts.det, 'model')
-            save_file = '{}.pkl'.format(epoch)
-            save_path = os.path.join(save_dir, '{}.pkl'.format(epoch))
+            save_file = '{:06d}.pkl'.format(epoch)
+            save_path = os.path.join(save_dir, save_file)
             torch.save({
                 'model': model.state_dict(),
                 'loss_list': loss_list,
