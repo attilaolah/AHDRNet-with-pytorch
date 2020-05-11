@@ -44,6 +44,7 @@ def train(opts, learn_rate: int = 0.0001) -> None:
     # Train:
     progress_bar = tqdm(range(current_epoch, opts.epoch), unit='epoch',
                         initial=current_epoch)
+    progress_bar.set_description('[ AHDRNet ]')
     for epoch in progress_bar:
         losses = []
         for step, sample in enumerate(loader):
@@ -66,8 +67,8 @@ def train(opts, learn_rate: int = 0.0001) -> None:
             psnr = batch_PSNR(torch.clamp(pre, 0., 1.), batch_x4, 1.0)
             losses.append(loss.item())
             progress_bar.set_description(
-                'EPOCH {:06d} | STEP {}/{} | LOSS {:0.6f} | PSNR {:0.6f}'
-                .format(epoch, step, len(loader), losses[-1], psnr))
+                '[ AHDRNet ] STEP {}/{} | LOSS {:0.6f} | PSNR {:0.6f}'
+                .format(step+1, len(loader), losses[-1], psnr))
 
             # Update the parameters:
             optimizer.zero_grad()
