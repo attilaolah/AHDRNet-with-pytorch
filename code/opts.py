@@ -43,8 +43,9 @@ class TrainOptions():
         parser = argparse.ArgumentParser()
         parser.add_argument('--folder', type=str, default="./data/Training")
         parser.add_argument('--batch_size', type=int, default=8)
-        parser.add_argument('--resume', type=str, default="latest.pth")
-        parser.add_argument('--det', type=str, default="train_result_1")
+        parser.add_argument('--resume', type=str,
+                            default="train_result/model/latest.pkl")
+        parser.add_argument('--det', type=str, default="train_result")
         parser.add_argument('--epoch', type=int, default=15000)
         parser.add_argument('--record_epoch', type=int, default=100)
         self.opts = parser.parse_args()
@@ -89,7 +90,7 @@ class TestOptions():
         parser.add_argument('--image1', type=str, required=True)
         parser.add_argument('--image2', type=str, required=True)
         parser.add_argument('--model', type=str,
-                            default="./train_result_1/model/latest.pth")
+                            default="./train_result/model/latest.pth")
         parser.add_argument('--res', type=str, default='./recover/result1.png')
         parser.add_argument('--H', type=int, default=400)
         parser.add_argument('--W', type=int, default=600)

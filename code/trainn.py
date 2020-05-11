@@ -1,7 +1,10 @@
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+"""Script to train the model.
 
-import cv2
+Author: Wei Wang
+"""
+
+import os
+
 import numpy as np
 import torch
 from torch import autograd
@@ -9,40 +12,40 @@ from torch import nn
 from torch import optim
 from tqdm import tqdm
 
-from datsetprocess import *
-from model import *
+from datsetprocess import DataLoader, MyDataset
+from model import AHDRNet
 from opts import TrainOptions
-from utils import *
+from utils import batch_PSNR
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 
-"""
-    Author: Wei Wang
-"""
-
-
-def train(opts):
-    # Create the loader
-    global ep
+def train(opts, learn_rate: int = 0.0001) -> None:
+    # Create the loader:
     train_data = MyDataset(scene_directory=opts.folder)
     loader = DataLoader(train_data, batch_size=opts.batch_size,
                         shuffle=True, num_workers=1)
-    # Create the model
+    # Create the model:
     model = AHDRNet().cuda()
     criterion = nn.L1Loss().to(opts.device)
-    optimizer = optim.Adam(model.parameters(), lr=0.0001)
+    optimizer = optim.Adam(model.parameters(), lr=learn_rate)
 
-    # Load pre-train model
+    loss_list = []
+    current_epoch = 0
+    # Load pre-train model:
     if os.path.exists(opts.resume):
+        resume_file = os.path.realpath(opts.resume)
+        basename, _ = os.path.splitext(os.path.basename(resume_file))
+        current_epoch = int(basename) + 1
         state = torch.load(opts.resume)
-        Loss_list = state['loss']
+        loss_list = state['loss_list']
         model.load_state_dict(state['model'])
-    else:
-        Loss_list = []
-    model.load_state_dict(torch.load('./Model/900.pkl'))
-    # Train
-    bar = tqdm(range(901, 15000))
-    for ep in bar:
-        loss_list = []
+
+    # Train:
+    progress_bar = tqdm(range(current_epoch, opts.epoch), unit='epoch',
+                        initial=current_epoch)
+    for epoch in progress_bar:
+        losses = []
         for step, sample in enumerate(loader):
             (batch_x1, batch_x2, batch_x3, batch_x4) = (
                 sample['input1'],
@@ -57,36 +60,38 @@ def train(opts):
                 autograd.Variable(batch_x4).cuda(),
             )
 
-            # Forward and compute loss
+            # Forward and compute loss:
             pre = model(batch_x1, batch_x2, batch_x3)
-            #pre = (torch.log(torch.FloatTensor(1).cuda() + 5000 * out)) / torch.log(torch.FloatTensor(1 + 5000).cuda())
             loss = criterion(pre, batch_x4)
             psnr = batch_PSNR(torch.clamp(pre, 0., 1.), batch_x4, 1.0)
-            loss_list.append(loss.item())
-            bar.set_description("Epoch: %d   Loss: %.6f" % (ep, loss_list[-1]))
+            losses.append(loss.item())
+            progress_bar.set_description(
+                'EPOCH {:06d} | STEP {}/{} | LOSS {:0.6f} | PSNR {:0.6f}'
+                .format(epoch, step, len(loader), losses[-1], psnr))
 
-            # Update the parameters
+            # Update the parameters:
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            print("[Epoch %d][G loss: %7f][PSNR : %7f]" %
-                  (ep, loss_list[-1], psnr))
-        Loss_list.append(np.mean(loss_list))
+        loss_list.append(np.mean(losses))
 
-        # Save the training image
-        '''
-         if ep % opts.record_epoch == 0:
-            img = fusePostProcess(y_f, y_hat, patch1, patch2, single = False)
-            cv2.imwrite(os.path.join(opts.det, 'image', str(ep) + ".png"), img[0, :, :, :])
-        '''
+        # Save the training model.
+        if epoch > 0 and epoch % opts.record_epoch == 0:
+            # Save progress:
+            save_dir = os.path.join(opts.det, 'model')
+            save_file = '{}.pkl'.format(epoch)
+            save_path = os.path.join(save_dir, '{}.pkl'.format(epoch))
+            torch.save({
+                'model': model.state_dict(),
+                'loss_list': loss_list,
+            }, save_path)
 
-        # Save the training model
-        if (ep % 100 == 0):
-            torch.save(model.state_dict(), './Model/%d.pkl' % (ep))
+            # Create a symlink for easy resume:
+            latest = os.path.join(save_dir, 'latest.pkl')
+            if os.path.exists(latest):
+                os.unlink(latest)
+            os.symlink(save_file, latest)
 
 
 if __name__ == '__main__':
-    opts = TrainOptions().parse()
-    train(opts)
-
-# def test(opts):
+    train(TrainOptions().parse())
