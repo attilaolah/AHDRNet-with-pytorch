@@ -15,37 +15,36 @@ from tqdm import tqdm
 
 from datsetprocess import AHDRDataset
 from model import AHDRNet
-from opts import TrainOptions
+import opts
 from utils import batch_PSNR
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 
-def train(opts, learn_rate: int = 0.0001) -> None:
+def train(args: opts.TrainingOptions) -> None:
     # Create the loader:
-    train_data = AHDRDataset(scene_directory=opts.folder)
-    loader = DataLoader(train_data, batch_size=opts.batch_size,
+    training_data = AHDRDataset(scene_directory=args.training_data)
+    loader = DataLoader(training_data, batch_size=args.batch_size,
                         shuffle=True, num_workers=1)
     # Create the model:
     model = AHDRNet().cuda()
-    criterion = nn.L1Loss().to(opts.device)
-    optimizer = optim.Adam(model.parameters(), lr=learn_rate)
+    criterion = nn.L1Loss().to(args.device.value)
+    optimizer = optim.Adam(model.parameters(), lr=args.learn_rate)
 
     loss_list = []
     current_epoch = 0
     # Load pre-train model:
-    if os.path.exists(opts.resume):
-        resume_file = os.path.realpath(opts.resume)
-        basename, _ = os.path.splitext(os.path.basename(resume_file))
+    if os.path.exists(args.checkpoint):
+        checkpoint_file = os.path.realpath(args.checkpoint)
+        basename, _ = os.path.splitext(os.path.basename(checkpoint_file))
         current_epoch = int(basename) + 1
-        state = torch.load(opts.resume)
+        state = torch.load(args.checkpoint)
         loss_list = state['loss_list']
         model.load_state_dict(state['model'])
 
     # Train:
-    progress_bar = tqdm(range(current_epoch, opts.epoch), unit='epoch',
+    progress_bar = tqdm(range(current_epoch, args.max_epoch), unit='epoch',
                         initial=current_epoch)
-    progress_bar.set_description('[ AHDRNet ]')
     for epoch in progress_bar:
         losses = []
         for step, sample in enumerate(loader):
@@ -68,7 +67,7 @@ def train(opts, learn_rate: int = 0.0001) -> None:
             psnr = batch_PSNR(torch.clamp(pre, 0., 1.), batch_x4, 1.0)
             losses.append(loss.item())
             progress_bar.set_description(
-                '[ AHDRNet ] STEP {}/{} | LOSS {:0.6f} | PSNR {:0.6f}'
+                'STEP {}/{} | LOSS {:0.6f} | PSNR {:0.6f}'
                 .format(step+1, len(loader), losses[-1], psnr))
 
             # Update the parameters:
@@ -78,22 +77,21 @@ def train(opts, learn_rate: int = 0.0001) -> None:
         loss_list.append(np.mean(losses))
 
         # Save the training model.
-        if epoch > 0 and epoch % opts.record_epoch == 0:
+        if epoch > 0 and epoch % opts.checkpoint_interval == 0:
             # Save progress:
-            save_dir = os.path.join(opts.det, 'model')
             save_file = '{:06d}.pkl'.format(epoch)
-            save_path = os.path.join(save_dir, save_file)
+            save_path = os.path.join(opts.model_directory, save_file)
             torch.save({
                 'model': model.state_dict(),
                 'loss_list': loss_list,
             }, save_path)
 
             # Create a symlink for easy resume:
-            latest = os.path.join(save_dir, 'latest.pkl')
+            latest = os.path.join(opts.model_directory, 'latest.pkl')
             if os.path.exists(latest):
                 os.unlink(latest)
             os.symlink(save_file, latest)
 
 
 if __name__ == '__main__':
-    train(TrainOptions().parse())
+    train(opts.TrainingOptions())
