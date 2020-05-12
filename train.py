@@ -13,7 +13,7 @@ from torch import optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from datsetprocess import MyDataset
+from datsetprocess import AHDRDataset
 from model import AHDRNet
 from opts import TrainOptions
 from utils import batch_PSNR
@@ -23,7 +23,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 def train(opts, learn_rate: int = 0.0001) -> None:
     # Create the loader:
-    train_data = MyDataset(scene_directory=opts.folder)
+    train_data = AHDRDataset(scene_directory=opts.folder)
     loader = DataLoader(train_data, batch_size=opts.batch_size,
                         shuffle=True, num_workers=1)
     # Create the model:

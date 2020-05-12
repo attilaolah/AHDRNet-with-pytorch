@@ -7,7 +7,7 @@ import torch
 from utils import LDR_to_HDR, ReadExpoTimes, ReadImages, ReadLabel, list_all_files_sorted, range_compressor
 
 
-class MyDataset(Dataset):
+class AHDRDataset(Dataset):
     def __init__(self, scene_directory):
         list = os.listdir(scene_directory)
         self.image_list = []
