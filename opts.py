@@ -37,7 +37,7 @@ class TrainingOptions(Options):
     # Path to the bracketed images.
     training_data: str = os.path.join('data', 'Training')
 
-    # Batch size. ~20 seems to use about 6215Mb of memory on the GPU.
+    # Batch size. ~20 seems to use about 7Gb of memory on the GPU.
     batch_size: int = 8
 
     # Where to store the train results.
