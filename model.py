@@ -4,7 +4,7 @@ from torch.nn import functional
 
 
 class Encoder3Conv(nn.Module):
-    def __init__(self, in_ch, out_ch):
+    def __init__(self, in_ch, out_ch) -> None:
         super().__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(in_ch, out_ch, 3, padding=1, padding_mode='zeros'),
@@ -21,7 +21,7 @@ class Encoder3Conv(nn.Module):
 
 
 class Encoder1Conv(nn.Module):
-    def __init__(self, in_ch, out_ch):
+    def __init__(self, in_ch, out_ch) -> None:
         super().__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(in_ch, out_ch, 3, padding=1, padding_mode='zeros'),
@@ -34,7 +34,7 @@ class Encoder1Conv(nn.Module):
 
 
 class AttentionModule(nn.Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(128, 64, 3, padding=1),
@@ -50,7 +50,7 @@ class AttentionModule(nn.Module):
 
 
 class DRDB(nn.Module):
-    def __init__(self, in_ch=64, growth_rate=32):
+    def __init__(self, in_ch: int = 64, growth_rate: int = 32) -> None:
         super().__init__()
         in_ch_ = in_ch
         self.Dcov1 = nn.Conv2d(in_ch_, growth_rate, 3, padding=2, dilation=2)
@@ -92,12 +92,9 @@ class DRDB(nn.Module):
 
 
 class AttentionNetwork(nn.Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.encoder = Encoder1Conv(6, 64)
-#        self.encoder = nn.Sequential(
-#            nn.Conv2d(6, 64, 3, padding=1),
-#            nn.ReLU(inplace=True),)
         self.attention = AttentionModule()
 
     def forward(self, x1, x2, x3):
@@ -113,7 +110,7 @@ class AttentionNetwork(nn.Module):
 
 
 class MergingNetwork(nn.Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.conv1 = nn.Conv2d(192, 64, 3, padding=1)
         self.DRDB1 = DRDB()
@@ -146,7 +143,7 @@ class MergingNetwork(nn.Module):
 
 
 class AHDRNet(nn.Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.A = AttentionNetwork()
         self.M = MergingNetwork()
