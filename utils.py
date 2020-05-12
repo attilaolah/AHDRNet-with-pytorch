@@ -52,7 +52,7 @@ def psnr(x, target):
     return 10 * math.log10(1/sqrdErr)
 
 
-def batch_PSNR(img, imclean, data_range):
+def batch_psnr(img, imclean, data_range):
     Img = img.data.cpu().numpy().astype(np.float32)
     Iclean = imclean.data.cpu().numpy().astype(np.float32)
     PSNR = 0
