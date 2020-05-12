@@ -14,7 +14,7 @@ from torch.utils import data
 import tqdm
 
 import datsetprocess
-import model
+import models
 import opts
 import utils
 
@@ -28,9 +28,9 @@ def train(args: opts.TrainingOptions) -> None:
     loader = data.DataLoader(training_data, batch_size=args.batch_size,
                              shuffle=True, num_workers=1)
     # Create the model:
-    ahdr_model = model.AHDRNet().cuda()
+    model = models.AHDRNet().cuda()
     criterion = nn.L1Loss().to(args.device.value)
-    optimizer = optim.Adam(ahdr_model.parameters(), lr=args.learn_rate)
+    optimizer = optim.Adam(model.parameters(), lr=args.learn_rate)
 
     loss_list = []
     current_epoch = 0
@@ -41,7 +41,7 @@ def train(args: opts.TrainingOptions) -> None:
         current_epoch = int(basename) + 1
         state = torch.load(args.checkpoint)
         loss_list = state['loss_list']
-        ahdr_model.load_state_dict(state['model'])
+        model.load_state_dict(state['model'])
 
     # Train:
     progress_bar = tqdm.tqdm(range(current_epoch, args.max_epoch),
@@ -63,7 +63,7 @@ def train(args: opts.TrainingOptions) -> None:
             )
 
             # Forward and compute loss:
-            pre = ahdr_model(batch_x1, batch_x2, batch_x3)
+            pre = model(batch_x1, batch_x2, batch_x3)
             loss = criterion(pre, batch_x4)
             psnr = utils.batch_psnr(torch.clamp(pre, 0., 1.), batch_x4, 1.0)
             losses.append(loss.item())
@@ -83,7 +83,7 @@ def train(args: opts.TrainingOptions) -> None:
             save_file = '{:06d}.pkl'.format(epoch)
             save_path = os.path.join(args.model_directory, save_file)
             torch.save({
-                'model': ahdr_model.state_dict(),
+                'model': model.state_dict(),
                 'loss_list': loss_list,
             }, save_path)
 
