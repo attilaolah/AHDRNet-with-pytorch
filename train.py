@@ -81,14 +81,14 @@ def train(args: opts.TrainingOptions) -> None:
         if epoch > 0 and epoch % args.checkpoint_interval == 0:
             # Save progress:
             save_file = '{:06d}.pkl'.format(epoch)
-            save_path = os.path.join(args.model_directory, save_file)
+            save_path = os.path.join(args.checkpoint_directory, save_file)
             torch.save({
                 'model': model.state_dict(),
                 'loss_list': loss_list,
             }, save_path)
 
             # Create a symlink for easy resume:
-            latest = os.path.join(args.model_directory, 'latest.pkl')
+            latest = os.path.join(args.checkpoint_directory, 'latest.pkl')
             if os.path.exists(latest):
                 os.unlink(latest)
             os.symlink(save_file, latest)
