@@ -28,7 +28,7 @@ class Options:
     def _present_parameters(cls, namespace: argparse.Namespace) -> None:
         """Print the parameters line by line."""
         print('{}: '.format(cls.__name__))
-        print(json.dumps(vars(namespace), indent=2))
+        print(json.dumps(vars(namespace), indent=2, sort_keys=True))
 
 
 class TrainingOptions(Options):

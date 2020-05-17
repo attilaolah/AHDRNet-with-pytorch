@@ -44,8 +44,13 @@ def train(args: opts.TrainingOptions) -> None:
         model.load_state_dict(state['model'])
 
     # Train:
-    progress_bar = tqdm.tqdm(range(current_epoch, args.max_epoch),
-                             unit='epoch', initial=current_epoch)
+    progress_bar = tqdm.tqdm(
+        iterable=range(current_epoch, args.max_epoch),
+        desc='STEP ?/? | LOSS ?.?????? | PSNR ?.????',
+        total=args.max_epoch,
+        initial=current_epoch,
+    )
+
     for epoch in progress_bar:
         losses = []
         for step, sample in enumerate(loader):
