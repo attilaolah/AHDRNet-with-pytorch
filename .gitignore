@@ -1,4 +1,13 @@
-__pycache__
+# Data & model directories.
 data
 model
 
+# Python cache.
+__pycache__
+
+# Image files.
+*.png
+*.tif
+*.hdr
+*.exr
+*.jpg
