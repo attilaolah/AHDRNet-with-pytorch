@@ -21,9 +21,22 @@ Recognition (CVPR), 2019.
 
 ## Code
 
-Main code in the folder code. The training and testing datasets can be find
-here. “Deep high dynamic range imaging of dynamic scenes,” ACM Transactions on
-Graphics (Proceedings of SIGGRAPH 2017), vol. 36, no. 4, 2017.
+Dependencies are managed with [`pipenv`](https://pypi.org/project/pipenv/). To
+download and install dependencies locally, run:
+
+```sh
+$ pipenv install
+```
+
+## Training & Test Data
+
+Download the training and test data sets, run `download_datasets.sh`.
+
+Then run the training script, which will update the trained model under `model`:
+
+```sh
+$ pipenv run python train.py
+```
 
 ## The Results
 
