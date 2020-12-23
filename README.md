@@ -17,7 +17,7 @@ error.
 
 [1] Yan, Qingsen and Gong, “Attention-guided Network for Ghost-free High
 Dynamic Range Imaging,” The IEEE Conference on Computer Vision and Pattern
-Recognition (CVPR),2019.
+Recognition (CVPR), 2019.
 
 ## Code
 
